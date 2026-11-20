@@ -50,3 +50,18 @@ python app.py
 
 
 Save it.
+
+## Screenshots
+
+### Login Page
+![Login Page](screenshots/login-page.png)
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+
+### Phishing Detection Result
+![Detection Result](screenshots/phishing-detection-result.png)
+
+### Wireshark Packet Capture
+![Wireshark Capture](screenshots/wireshark-capture.png)
+
