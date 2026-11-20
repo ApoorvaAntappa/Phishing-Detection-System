@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phishing Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard-layout">
+
+    <aside class="sidebar">
+        <h2>Cyber Panel</h2>
+        <a href="/dashboard">Dashboard</a>
+        <a href="#urlChecker">URL Checker</a>
+        <a href="#emailChecker">Email Checker</a>
+        <a href="#liveMonitor">Live Monitor</a>
+        <a href="#liveEmails">Live Emails</a>
+        <a href="#alerts">Alerts</a>
+        <a href="/logout">Logout</a>
+    </aside>
+
+    <main class="dashboard-main">
+
+        <h1>Welcome {{ username }}</h1>
+
+        <div class="dashboard-cards">
+            <div class="dash-card">
+                <h3>Total URLs</h3>
+                <h2 id="totalUrls">0</h2>
+            </div>
+
+            <div class="dash-card safe">
+                <h3>Safe URLs</h3>
+                <h2 id="safeUrls">0</h2>
+            </div>
+
+            <div class="dash-card danger">
+                <h3>Phishing URLs</h3>
+                <h2 id="phishingUrls">0</h2>
+            </div>
+
+            <div class="dash-card warning">
+                <h3>Suspicious URLs</h3>
+                <h2 id="suspiciousUrls">0</h2>
+            </div>
+        </div>
+
+        <section class="panel" id="urlChecker">
+            <h2>Manual URL Checker</h2>
+            <input type="text" id="urlInput" placeholder="Enter URL like google.com or https://example.com/login">
+            <button onclick="checkURL()">Check URL</button>
+            <h3 id="urlResult"></h3>
+        </section>
+
+        <section class="panel" id="emailChecker">
+            <h2>Email Checker</h2>
+            <input type="text" id="senderInput" placeholder="Sender Email">
+            <input type="text" id="subjectInput" placeholder="Email Subject">
+            <textarea id="emailBodyInput" placeholder="Paste email content here"></textarea>
+            <button onclick="checkEmail()">Check Email</button>
+            <h3 id="emailResult"></h3>
+        </section>
+
+        <section class="panel" id="liveMonitor">
+            <h2>Real-Time Detected Websites</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Domain</th>
+                        <th>URL</th>
+                        <th>Status</th>
+                        <th>Risk</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="liveUrlTable">
+                    <tr>
+                        <td colspan="6">Loading website detections...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel" id="liveEmails">
+            <h2>Live Email Monitoring</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Sender</th>
+                        <th>Subject</th>
+                        <th>Link</th>
+                        <th>Status</th>
+                        <th>Risk</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="liveEmailTable">
+                    <tr>
+                        <td colspan="7">No emails scanned yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel" id="alerts">
+            <h2>Security Alerts</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Alert Message</th>
+                        <th>Severity</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="alertTable">
+                    <tr>
+                        <td colspan="4">No alerts yet.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+function statusColor(status) {
+    if (status === "SAFE") return "green";
+    if (status === "PHISHING") return "red";
+    if (status === "SUSPICIOUS") return "orange";
+    return "black";
+}
+
+function severityColor(severity) {
+    if (severity === "HIGH") return "red";
+    if (severity === "MEDIUM") return "orange";
+    if (severity === "LOW") return "green";
+    return "black";
+}
+
+function loadDashboardData() {
+    fetch("/api/dashboard")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("totalUrls").innerText = data.total;
+        document.getElementById("safeUrls").innerText = data.safe;
+        document.getElementById("phishingUrls").innerText = data.phishing;
+        document.getElementById("suspiciousUrls").innerText = data.suspicious;
+
+        let table = "";
+
+        if (!data.urls || data.urls.length === 0) {
+            table = `<tr><td colspan="6">No real-time detections yet.</td></tr>`;
+        } else {
+            data.urls.forEach(row => {
+                table += `
+                    <tr>
+                        <td>${row.id}</td>
+                        <td>${row.domain}</td>
+                        <td>${row.url}</td>
+                        <td style="color:${statusColor(row.status)}; font-weight:bold;">${row.status}</td>
+                        <td>${row.risk}%</td>
+                        <td>${row.time}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("liveUrlTable").innerHTML = table;
+    })
+    .catch(error => console.log("Dashboard API Error:", error));
+}
+
+function loadEmailData() {
+    fetch("/api/emails")
+    .then(response => response.json())
+    .then(data => {
+        let table = "";
+
+        if (!data.emails || data.emails.length === 0) {
+            table = `<tr><td colspan="7">No emails scanned yet.</td></tr>`;
+        } else {
+            data.emails.forEach(row => {
+                table += `
+                    <tr>
+                        <td>${row.id}</td>
+                        <td>${row.sender}</td>
+                        <td>${row.subject}</td>
+                        <td>${row.link}</td>
+                        <td style="color:${statusColor(row.status)}; font-weight:bold;">${row.status}</td>
+                        <td>${row.risk}%</td>
+                        <td>${row.time}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("liveEmailTable").innerHTML = table;
+    })
+    .catch(error => console.log("Email API Error:", error));
+}
+
+function loadAlerts() {
+    fetch("/api/alerts")
+    .then(response => response.json())
+    .then(data => {
+        let table = "";
+
+        if (!data.alerts || data.alerts.length === 0) {
+            table = `<tr><td colspan="4">No alerts yet.</td></tr>`;
+        } else {
+            data.alerts.forEach(row => {
+                table += `
+                    <tr>
+                        <td>${row.id}</td>
+                        <td>${row.message}</td>
+                        <td style="color:${severityColor(row.severity)}; font-weight:bold;">${row.severity}</td>
+                        <td>${row.time}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById("alertTable").innerHTML = table;
+    })
+    .catch(error => console.log("Alert API Error:", error));
+}
+
+function checkURL() {
+    let url = document.getElementById("urlInput").value.trim();
+
+    if (url === "") {
+        document.getElementById("urlResult").innerHTML =
+            "<span style='color:red'>Please enter a URL</span>";
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("url", url);
+
+    fetch("/check_url", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("urlResult").innerHTML =
+            `Result: <span style="color:${statusColor(data.status)}">${data.status}</span> | Risk: ${data.risk_score}%`;
+
+        loadDashboardData();
+        loadAlerts();
+    })
+    .catch(error => {
+        document.getElementById("urlResult").innerHTML =
+            "<span style='color:red'>URL check failed</span>";
+        console.log(error);
+    });
+}
+
+function checkEmail() {
+    let sender = document.getElementById("senderInput").value.trim();
+    let subject = document.getElementById("subjectInput").value.trim();
+    let body = document.getElementById("emailBodyInput").value.trim();
+
+    if (sender === "" && subject === "" && body === "") {
+        document.getElementById("emailResult").innerHTML =
+            "<span style='color:red'>Please enter email details</span>";
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("sender", sender);
+    formData.append("subject", subject);
+    formData.append("body", body);
+
+    fetch("/check_email", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("emailResult").innerHTML =
+            `Result: <span style="color:${statusColor(data.status)}">${data.status}</span> | Risk: ${data.risk_score}%`;
+
+        loadEmailData();
+        loadAlerts();
+    })
+    .catch(error => {
+        document.getElementById("emailResult").innerHTML =
+            "<span style='color:red'>Email check failed</span>";
+        console.log(error);
+    });
+}
+
+setInterval(loadDashboardData, 3000);
+setInterval(loadEmailData, 5000);
+setInterval(loadAlerts, 5000);
+
+loadDashboardData();
+loadEmailData();
+loadAlerts();
+</script>
+
+</body>
+</html>

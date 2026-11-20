@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "model"
+version = "0.1.0"
+description = "Phishing detection model package"
+requires-python = ">=3.8"
+dependencies = ["joblib", "scikit-learn"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"model" = ["phishing_model.pkl"]

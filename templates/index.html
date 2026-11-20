@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phishing Websites Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <h2>Phishing Websites Detection</h2>
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#feedback">Feedback</a></li>
+        <li><a href="/login" class="login-btn">Login</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="slide active">
+        <div class="hero-content">
+            <h1>Detection of Phishing Websites</h1>
+            <p>Using Machine Learning and Real-Time Monitoring</p>
+            <a href="/login" class="main-btn">Get Started</a>
+        </div>
+    </div>
+</section>
+
+<section class="stats">
+    <div>
+        <h2>5000+</h2>
+        <p>URLs Checked</p>
+    </div>
+    <div>
+        <h2>1200+</h2>
+        <p>Phishing URLs Found</p>
+    </div>
+    <div>
+        <h2>98%</h2>
+        <p>Detection Accuracy</p>
+    </div>
+    <div>
+        <h2>24/7</h2>
+        <p>Monitoring</p>
+    </div>
+</section>
+
+<section id="features" class="section">
+    <h1>Project Features</h1>
+
+    <div class="cards">
+        <div class="card">
+            <h3>URL Detection</h3>
+            <p>Check website links and classify them as safe or phishing.</p>
+        </div>
+
+        <div class="card">
+            <h3>Email Detection</h3>
+            <p>Analyze suspicious email content and malicious links.</p>
+        </div>
+
+        <div class="card">
+            <h3>Real-Time Monitoring</h3>
+            <p>Detect visited websites in real time using Wireshark.</p>
+        </div>
+
+        <div class="card">
+            <h3>Dashboard</h3>
+            <p>View live detections, reports, and security statistics.</p>
+        </div>
+    </div>
+</section>
+
+<section id="faq" class="section faq">
+    <h1>Frequently Asked Questions</h1>
+
+    <details>
+        <summary>What is phishing?</summary>
+        <p>Phishing is a cyber attack where fake websites or emails are used to steal sensitive information.</p>
+    </details>
+
+    <details>
+        <summary>How does this project detect phishing?</summary>
+        <p>It extracts URL features and uses machine learning to classify URLs as safe or phishing.</p>
+    </details>
+
+    <details>
+        <summary>Does it support real-time detection?</summary>
+        <p>Yes, the system can monitor network traffic using Wireshark and update the dashboard.</p>
+    </details>
+</section>
+
+<section id="feedback" class="section feedback">
+    <h1>Feedback</h1>
+
+    <form>
+        <input type="text" placeholder="Your Name">
+        <input type="email" placeholder="Your Email">
+        <textarea placeholder="Your Feedback"></textarea>
+        <button type="submit">Submit Feedback</button>
+    </form>
+</section>
+
+<footer>
+    <p>Contact: phishingproject@gmail.com | Phone: +91 9876543210</p>
+    <p>© 2026 Phishing Detection System</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+</body>
+</html>
